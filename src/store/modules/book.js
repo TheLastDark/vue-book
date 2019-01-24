@@ -1,9 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-
-Vue.use(Vuex)
-
-export default new Vuex.Store({
+const book = {
   state: {
     test: 1
   },
@@ -14,7 +9,8 @@ export default new Vuex.Store({
   },
   actions: {
     setTest: ({ commit, state }, newTest) => {
-      console.log(state.test, newTest)
+      return commit('SET_TEST', newTest)
     }
   }
-})
+}
+export default book

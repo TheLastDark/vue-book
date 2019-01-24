@@ -4,10 +4,17 @@
     <div class="text">123</div>
   </div>
 </template>
+
 <script>
+import { mapGetters } from 'vuex'
 export default {
+  computed: {
+    ...mapGetters(['test'])
+  },
   mounted () {
-    this.$store.dispatch('setTest', 10)
+    this.$store.dispatch('setTest', 18).then(() => {
+      console.log(this.test)
+    })
   }
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   html.style.fontSize = fontSize + 'px'
 })
 </script>
+
 <style lang="scss" scoped>
   @import './assets/styles/global';
   .text {
