@@ -18,15 +18,23 @@ export default {
   },
   methods: {
   initEpub () {
-      const url = 'http://192.168.31.128:8080/ebook/epub/' + this.fileName + '.epub'
+      const url = '/ebook/epub/' + this.fileName + '.epub'
       this.book = new Epub(url)
-      console.log(this.book)
       this.rendition = this.book.renderTo('read', {
         width: innerWidth,
         height: innerHeight,
         method: 'default'
       })
       this.rendition.display()
+      this.rendition.on('click', event => {
+          this.touchStartX = event.changedTouches[0].clientX
+          this.touchStartTime = event.timeStamp
+      })
+      // this.rendition.on('touchend', event => {
+      //   const offsetX = event.changeTouches[0].clientX - this.touchStartX
+      //   const time = event.timeStamp - this.touchStartTime
+      //   console.log(123)
+      // })
     }
   },
   mounted () {
