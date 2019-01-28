@@ -1,15 +1,14 @@
 const book = {
   state: {
-    fileName: ''
+    fileName: '',
+    menuVisible: true
   },
   mutations: {
     'SET_FILENAME': (state, fileName) => {
       state.fileName = fileName
-    }
-  },
-  actions: {
-    setFileName: ({ commit }, fileName) => {
-      return commit('SET_FILENAME', fileName)
+    },
+    'SET_VISIBLE': (state, menuVisible) => {
+      state.menuVisible = menuVisible
     }
   }
 }
