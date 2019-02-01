@@ -6,6 +6,7 @@
 <script>
 import Epub from 'epubjs'
 import { ebookMixin } from '../../utils/mixin'
+import { getFontFamily, saveFontFamily, saveFontSize, getFontSize } from '../../utils/localStorage'
 global.ePub = Epub
 export default {
   name: 'EbookReader',
@@ -19,7 +20,6 @@ export default {
    mounted () {
     this.setFileName(this.$route.params.fileName.split('|').join('/')).then(() => {
       this.initEpub()
-      // console.log(this.$route.params.fileName)
     })
   },
   methods: {
@@ -36,20 +36,48 @@ export default {
     }
   },
   toggleTitleAndMenu () {
-    this.setMenuVisible('setMenuVisoble', !this.menuVisible)
+    if (this.menuVisible) {
+    this.setSettingVisible(-1)
+    this.setFontFamilyVisible(false)
+    }
+    this.setMenuVisible(!this.menuVisible)
   },
   hideTitleAndMenu () {
-    this.setMenuVisible('setMenuVisoble', false)
+    this.setMenuVisible(false)
+    this.setSettingVisible(-1)
+    this.setFontFamilyVisible(false)
+  },
+  initFontsize () {
+     let font = getFontFamily(this.fileName)
+        if (!font) {
+          saveFontFamily(this.fileName, this.defaultFontFamily)
+        } else {
+            this.rendition.themes.font(font)// 没有生效
+            this.setDefaultFontFamily(font)
+          }
+  },
+  initFontFamily () {
+     let fontSize = getFontSize(this.fileName)
+        if (!fontSize) {
+          saveFontSize(this.fileName, this.defaultFontSize)
+        } else {
+            this.rendition.themes.fontSize(fontSize)// 没有生效
+            this.setDefaultFontSize(fontSize)
+          }
   },
   initEpub () {
-      const url = '/ebook/epub/' + this.$store.state.book.fileName + '.epub'
+      const url = `${process.env.VUE_APP_RES_URL}/ebook/epub/${this.fileName}.epub`
       this.book = new Epub(url)
+      this.setCurrentBook(this.book)
       this.rendition = this.book.renderTo('read', {
         width: innerWidth,
         height: innerHeight,
         method: 'default'
       })
-      this.rendition.display()
+      this.rendition.display().then(() => {
+        this.initFontsize()
+        this.initFontFamily()
+      })
       this.rendition.on('touchstart', event => {
           this.touchStartX = event.changedTouches[0].clientX
           this.touchStartTime = event.timeStamp
@@ -67,6 +95,14 @@ export default {
         }
         event.preventDefault()
         event.stopPropagation()
+      })
+      this.rendition.hooks.content.register(content => {
+        Promise.all([
+        content.addStylesheet(`${process.env.VUE_APP_RES_URL}/ebook/fonts/cabin.css`),
+        content.addStylesheet(`${process.env.VUE_APP_RES_URL}/ebook/fonts/daysOne.css`),
+        content.addStylesheet(`${process.env.VUE_APP_RES_URL}/ebook/fonts/montserrat.css`),
+        content.addStylesheet(`${process.env.VUE_APP_RES_URL}/ebook/fonts/tangerine.css`)
+        ]).then(() => {})
       })
     }
   }
