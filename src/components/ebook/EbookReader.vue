@@ -79,10 +79,10 @@ export default {
         this.initFontFamily()
       })
       this.rendition.on('touchstart', event => {
+          console.log(event)
           this.touchStartX = event.changedTouches[0].clientX
           this.touchStartTime = event.timeStamp
-          console.log(event)
-      })
+      }, { passive: true })
       this.rendition.on('touchend', event => {
         const offsetX = event.changeTouches[0].clientX - this.touchStartX
         const time = event.timeStamp - this.touchStartTime
@@ -93,9 +93,9 @@ export default {
         } else {
           this.toggleTitleAndMenu()
         }
-        event.preventDefault()
+        // event.preventDefault()
         event.stopPropagation()
-      })
+      }, { passive: true })
       this.rendition.hooks.content.register(content => {
         Promise.all([
         content.addStylesheet(`${process.env.VUE_APP_RES_URL}/ebook/fonts/cabin.css`),
