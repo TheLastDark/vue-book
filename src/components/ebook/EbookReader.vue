@@ -6,14 +6,10 @@
 <script>
 import Epub from 'epubjs'
 import { ebookMixin } from '../../utils/mixin'
-import { getFontFamily, saveFontFamily, saveFontSize, getFontSize } from '../../utils/localStorage'
+import { getFontFamily, saveFontFamily, saveFontSize, getFontSize, getTheme, saveTheme } from '../../utils/localStorage'
 global.ePub = Epub
 export default {
   name: 'EbookReader',
-  data () {
-    return {
-    }
-  },
   mixins: [ebookMixin],
   computed: {
   },
@@ -47,6 +43,18 @@ export default {
     this.setSettingVisible(-1)
     this.setFontFamilyVisible(false)
   },
+  initTheme () {
+    let defaultTheme = getTheme(this.fileName)
+    if (!defaultTheme) {
+      defaultTheme = this.themeList[0].name
+      saveTheme(this.fileName, defaultTheme)
+    }
+    this.setDefaultTheme(defaultTheme)
+    this.themeList.forEach(theme => {
+    this.rendition.themes.register(theme.name, theme.style)
+    })
+    this.rendition.themes.select(defaultTheme)
+  },
   initFontsize () {
      let font = getFontFamily(this.fileName)
         if (!font) {
@@ -75,8 +83,10 @@ export default {
         method: 'default'
       })
       this.rendition.display().then(() => {
+        this.initTheme()
         this.initFontsize()
         this.initFontFamily()
+        this.initGlobalStyle()
       })
       this.rendition.on('touchstart', event => {
           console.log(event)
